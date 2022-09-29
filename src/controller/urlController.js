@@ -9,17 +9,31 @@ const isValid = function (value) {
     return false;
   };
   
-  const shortUrl = async function (req,res) {
+  const createShortUrl = async function (req,res) {
     try{
         const data = req.body;
          if (Object.keys(data) == 0 ) {
             return res.status(400).send ({status: false, message: "please provide data in request body"})}
-            const longUrl = req.body.longUrl;
-            const isUrl = longUrl.toLowerCase();
-            if  (!isValid(isUrl)) { return res.status(400).send({status: false, message: "please provide long url"})}
-            if (!validUrl.isUri(isUrl)) { return res.status(400).send({status: false, message: "Enter valid url"})}
+            const longurl = req.body.longUrl;
+            const longUrl = longurl.toLowerCase();
+            if  (!isValid(longUrl)) { return res.status(400).send({status: false, message: "please provide long url"})}
+            if (!validUrl.isUri(longUrl)) { return res.status(400).send({status: false, message: "Enter valid url"})}
             if  (!isValid(baseUrl)) { return res.status(400).send({status: false, message: "please provide base url"})}
             if (!validUrl.isUri(baseUrl)) { return res.status(400).send({status: false, message: "Enter valid base url"})}
+
+            let findUrl = await urlModel.findOne({ longUrl: longUrl }).select({__v: 0, _id: 0})
+            if(findUrl)
+                return res.status(200).send({status: true, message: "Already created short url for this long url", data: findUrl})
+        
+            const urlCode = shortId.generate()    
+            const shortUrl = baseUrl + '/' + urlCode
+    
+            data.urlCode = urlCode
+            data.shortUrl = shortUrl
+    
+            await urlModel.create({urlCode: urlCode, longUrl: longUrl, shortUrl: shortUrl})
+            return res.status(201).send({status: true, message: "Successfully Shorten the URL.", data: {urlCode: urlCode, longUrl: longUrl, shortUrl: shortUrl}})
+
 
          }
          catch (error) {
@@ -28,3 +42,6 @@ const isValid = function (value) {
         }
     }
   
+
+
+    module.exports = { createShortUrl }

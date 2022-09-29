@@ -1,12 +1,8 @@
 {
-  "dependencies": {
-    "nodemon": "^2.0.20"
-  },
   "name": "project-4-url-shortener",
   "description": "Scalable URL Shortner Project Requirement\r Phase I\r Overview\r URL shortening is used to create shorter aliases for long URLs. We call these shortened aliases “short links.” Users are redirected to the original URL when they hit these short links. Short links save a lot of space when displayed, printed, messaged, or tweeted. Additionally, users are less likely to mistype shorter URLs.",
   "version": "1.0.0",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,5 +15,13 @@
   "bugs": {
     "url": "https://github.com/Rajnigandha-Jadhav/Project-4-URL-Shortener/issues"
   },
-  "homepage": "https://github.com/Rajnigandha-Jadhav/Project-4-URL-Shortener#readme"
+  "homepage": "https://github.com/Rajnigandha-Jadhav/Project-4-URL-Shortener#readme",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "express": "^4.18.1",
+    "mongoose": "^6.6.2",
+    "nodemon": "^2.0.20",
+    "shortid": "^2.2.16",
+    "valid-url": "^1.0.9"
+  }
 }

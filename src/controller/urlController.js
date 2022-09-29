@@ -1,30 +1,40 @@
 const urlModel = require("../models/urlModel")
-const baseUrl = 'http://localhost:3000'
-const validUrl = require("valid-url");
-const shortId = require("shortid");
+const shortid = require("shortid")
+const validURL = require("valid-url")
 
-const isValid = function (value) {
-    if (typeof value === "undefined" || value === null) return false;
-    if (typeof value === "string" && value.trim().length > 0) return true;
-    return false;
-  };
+
+
   
-  const shortUrl = async function (req,res) {
+
+
+
+
+const createShortURL = async function(req,res){
     try{
-        const data = req.body;
-         if (Object.keys(data) == 0 ) {
-            return res.status(400).send ({status: false, message: "please provide data in request body"})}
-            const longUrl = req.body.longUrl;
-            const isUrl = longUrl.toLowerCase();
-            if  (!isValid(isUrl)) { return res.status(400).send({status: false, message: "please provide long url"})}
-            if (!validUrl.isUri(isUrl)) { return res.status(400).send({status: false, message: "Enter valid url"})}
-            if  (!isValid(baseUrl)) { return res.status(400).send({status: false, message: "please provide base url"})}
-            if (!validUrl.isUri(baseUrl)) { return res.status(400).send({status: false, message: "Enter valid base url"})}
-
-         }
-         catch (error) {
-            console.log(error)
-            return res.status(500).send({ message: error.message })
-        }
+    let data = req.body
+     if(Object.keys(data).length == 0){
+        return res.status(400).send({status:false, message:"Body should not be empty"})
+     }
+    let longUrl = data.longUrl.toLowerCase()
+    if(!longUrl) return res.status(400).send({satus:false, message:"longUrl is mandatory"})
+    if(!validURL.isUri(longUrl)) return res.status(400).send({status:false, message:"please enter the valid URL"})
+     let UrlExist = await urlModel.findOne({longUrl:longUrl})
+     if(UrlExist){
+        //let URL = UrlExist.shortUrl
+        return res.status(400).send({status:false, message:"Given longUrl already exists"})
+     }
+     let ID = shortid.generate()
+     let Objects = {urlCode:ID, longUrl:longUrl, shortUrl:`http://localhost:3000/${ID}` }
+     let savedData = await urlModel.create(Objects)
+     let Obj = {urlCode:savedData.urlCode, longUrl:savedData.longUrl, shortUrl:savedData.shortUrl}
+     return res.status(201).send({status:true, data:Obj})
+    }catch(error){
+        return res.status(500).send({status:false, message:error.message})
     }
-  
+}
+
+
+
+
+
+module.exports.createShortURL = createShortURL

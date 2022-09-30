@@ -1,7 +1,7 @@
 const urlModel = require("../models/urlModel")
 const shortid = require("shortid")
 const validURL = require("valid-url")
-
+const baseURL = "http://localhost:3000"
 
 
 const createShortURL = async function (req, res) {
@@ -12,14 +12,20 @@ const createShortURL = async function (req, res) {
         }
         let longUrl = data.longUrl.toLowerCase()
         if (!longUrl) return res.status(400).send({ satus: false, message: "longUrl is mandatory" })
-        if (!validURL.isUri(longUrl)) return res.status(400).send({ status: false, message: "please enter the valid URL" })
+        if (!validURL.isUri(longUrl)) return res.status(400).send({ status: false, message: "please enter the valid longURL" })
+        if (!validURL.isUri(baseURL)) return res.status(400).send({ status: false, message: "please enter the valid baseURL" })
+
         let UrlExist = await urlModel.findOne({ longUrl: longUrl })
         if (UrlExist) {
             let URL = UrlExist.shortUrl
-            return res.status(400).send({ status: false, message: "Given longUrl already exists", data: URL })
+            return res.status(400).send({ status: false, message: "Given longUrl already exists", data:URL })
         }
+
         let ID = shortid.generate()
-        let Objects = { urlCode: ID, longUrl: longUrl, shortUrl: `http://localhost:3000/${ID}` }
+        const shortUrl = baseUrl + '/' + ID
+
+        
+        let Objects = { urlCode: ID, longUrl: longUrl, shortUrl: shortUrl }
         let savedData = await urlModel.create(Objects)
         let Obj = { urlCode: savedData.urlCode, longUrl: savedData.longUrl, shortUrl: savedData.shortUrl }
         return res.status(201).send({ status: true, data: Obj })
@@ -27,7 +33,6 @@ const createShortURL = async function (req, res) {
         return res.status(500).send({ status: false, message: error.message })
     }
 }
-
 
 const getUrlCode = async function (req, res) {
     try {
@@ -48,6 +53,6 @@ const getUrlCode = async function (req, res) {
 };
 
 
+
 module.exports.createShortURL = createShortURL
 module.exports.getUrlCode = getUrlCode
-

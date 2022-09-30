@@ -15,8 +15,8 @@ const createShortURL = async function (req, res) {
         if (!validURL.isUri(longUrl)) return res.status(400).send({ status: false, message: "please enter the valid URL" })
         let UrlExist = await urlModel.findOne({ longUrl: longUrl })
         if (UrlExist) {
-            //let URL = UrlExist.shortUrl
-            return res.status(400).send({ status: false, message: "Given longUrl already exists" })
+            let URL = UrlExist.shortUrl
+            return res.status(400).send({ status: false, message: "Given longUrl already exists", data: URL })
         }
         let ID = shortid.generate()
         let Objects = { urlCode: ID, longUrl: longUrl, shortUrl: `http://localhost:3000/${ID}` }
@@ -28,12 +28,18 @@ const createShortURL = async function (req, res) {
     }
 }
 
+
 const getUrlCode = async function (req, res) {
     try {
         let urlCode = req.params.urlCode;
+       
+     
+        let findUrl = await urlModel.findOne({ urlCode: urlCode })
+        if(!findUrl){
 
-        let findUrl = await urlModel.findOne({ urlCode: urlCode }).select({ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 })
-        return res.status(200).send({ status: true, data: findUrl });
+            return res.status(404).send({status:false, message:"URL document not found"})
+        }
+        return res.status(302).redirect(findUrl.longUrl)
 
     } catch (error) {
         return res.status(500).send({ status: false, message: error.message })
@@ -42,15 +48,5 @@ const getUrlCode = async function (req, res) {
 };
 
 
-
-<<<<<<< HEAD
-
-
-
-
-
-module.exports.createShortURL = createShortURL
-=======
 module.exports.createShortURL = createShortURL
 module.exports.getUrlCode = getUrlCode
->>>>>>> 14500a9b26cb61e376cadf97d72858b4052f8b31

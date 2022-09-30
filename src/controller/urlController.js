@@ -15,8 +15,8 @@ const createShortURL = async function (req, res) {
         if (!validURL.isUri(longUrl)) return res.status(400).send({ status: false, message: "please enter the valid URL" })
         let UrlExist = await urlModel.findOne({ longUrl: longUrl })
         if (UrlExist) {
-            //let URL = UrlExist.shortUrl
-            return res.status(400).send({ status: false, message: "Given longUrl already exists" })
+            let URL = UrlExist.shortUrl
+            return res.status(400).send({ status: false, message: "Given longUrl already exists", data: URL })
         }
         let ID = shortid.generate()
         let Objects = { urlCode: ID, longUrl: longUrl, shortUrl: `http://localhost:3000/${ID}` }
@@ -27,6 +27,7 @@ const createShortURL = async function (req, res) {
         return res.status(500).send({ status: false, message: error.message })
     }
 }
+
 
 const getUrlCode = async function (req, res) {
     try {
@@ -47,6 +48,6 @@ const getUrlCode = async function (req, res) {
 };
 
 
-
 module.exports.createShortURL = createShortURL
 module.exports.getUrlCode = getUrlCode
+

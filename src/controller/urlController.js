@@ -16,13 +16,13 @@ const createShortURL = async function (req, res) {
         if (!validURL.isUri(baseURL)) return res.status(400).send({ status: false, message: "please enter the valid baseURL" })
 
         let UrlExist = await urlModel.findOne({ longUrl: longUrl })
-        if (UrlExist) {
+        if (UrlExist) { 
             let URL = UrlExist.shortUrl
             return res.status(400).send({ status: false, message: "Given longUrl already exists", data:URL })
         }
 
         let ID = shortid.generate()
-        const shortUrl = baseUrl + '/' + ID
+        const shortUrl = baseURL + '/' + ID
 
         
         let Objects = { urlCode: ID, longUrl: longUrl, shortUrl: shortUrl }

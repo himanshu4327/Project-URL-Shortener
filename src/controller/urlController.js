@@ -50,3 +50,4 @@ const getUrlCode = async function (req, res) {
 
 module.exports.createShortURL = createShortURL
 module.exports.getUrlCode = getUrlCode
+

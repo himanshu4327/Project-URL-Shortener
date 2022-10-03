@@ -2,6 +2,33 @@ const urlModel = require("../models/urlModel")
 const shortid = require("shortid")
 const validURL = require("valid-url")
 const baseURL = "http://localhost:3000"
+const redis = require("redis");
+const { promisify } = require("util");
+
+
+//Connect to redis
+const redisClient = redis.createClient(
+    10029,
+    "redis-10029.c212.ap-south-1-1.ec2.cloud.redislabs.com",
+    { no_ready_check: true }
+  );
+  redisClient.auth("yueHvqVlYjxIbAQ9vWHer4CRZfvPcKr1", function (err) {
+    if (err) throw err;
+  });
+  
+  redisClient.on("connect", async function () {
+    console.log("Connected to Redis..");
+  });
+  
+
+  //1. connect to the server
+//2. use the commands :
+
+//Connection setup for redis
+
+const SET_ASYNC = promisify(redisClient.SET).bind(redisClient);
+const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
+
 
 
 const createShortURL = async function (req, res) {

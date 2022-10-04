@@ -42,10 +42,15 @@ const createShortURL = async function (req, res) {
         if (!validURL.isUri(longUrl)) return res.status(400).send({ status: false, message: "please enter the valid longURL" })
         if (!validURL.isUri(baseURL)) return res.status(400).send({ status: false, message: "please enter the valid baseURL" })
 
+        let  cahcedurlData = await GET_ASYNC(`${longUrl}`)
+        if (cahcedurlData) { return res.status(200).send({ status: true, data: JSON.parse(cahcedurlData) }) }
+
+
         let UrlExist = await urlModel.findOne({ longUrl: longUrl })
         if (UrlExist) { 
-            let URL = UrlExist.shortUrl
-            return res.status(400).send({ status: false, message: "Given longUrl already exists", data:URL })
+            await SET_ASYNC(`${longUrl}`, JSON.stringify(UrlExist));
+            //let URL = UrlExist.shortUrl
+            return res.status(400).send({ status: false, message: "Given longUrl already exists", data: UrlExist })
         }
 
         let ID = shortid.generate()
@@ -64,13 +69,15 @@ const createShortURL = async function (req, res) {
 const getUrlCode = async function (req, res) {
     try {
         let urlCode = req.params.urlCode;
-       
-     
+        let cachedurlcodeData = await GET_ASYNC(`${urlCode}`)
+        if (cachedurlcodeData) { return res.status(302).redirect(JSON.parse(cachedurlcodeData)) }
+        
         let findUrl = await urlModel.findOne({ urlCode: urlCode })
         if(!findUrl){
 
             return res.status(404).send({status:false, message:"URL document not found"})
         }
+        await SET_ASYNC(`${urlCode}`, JSON.stringify(findUrl.longUrl))
         return res.status(302).redirect(findUrl.longUrl)
 
     } catch (error) {

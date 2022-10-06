@@ -4,7 +4,7 @@ const validator = require("validator")
 const baseURL = "http://localhost:3000"
 const redis = require("redis");
 
-const { promisify } = require("util"); // callbacks and promisify
+const { promisify } = require("util");
 
 
 //Connect to redis
@@ -44,7 +44,7 @@ const createShortURL = async function (req, res) {
 
 
         let cachedUrlData = await GET_ASYNC(`${longUrl}`)
-        if (cachedUrlData) { return res.status(200).send({ status: true, message: "data from cache", data: JSON.parse(cachedUrlData) }) }
+        if (cachedUrlData) { return res.status(201).send({ status: true, message: "data from cache", data: JSON.parse(cachedUrlData) }) }
 
 
         let UrlExist = await urlModel.findOne({ longUrl: longUrl })
@@ -59,10 +59,10 @@ const createShortURL = async function (req, res) {
         const shortUrl = baseURL + '/' + ID
         
 
-
         let Objects = { urlCode: ID, longUrl: longUrl, shortUrl: shortUrl }
         let savedData = await urlModel.create(Objects)
         let Obj = { urlCode: savedData.urlCode, longUrl: savedData.longUrl, shortUrl: savedData.shortUrl }
+        await SET_ASYNC(`${longUrl}`, JSON.stringify(Obj))
         return res.status(201).send({ status: true, data: Obj })
 
     } catch (error) {
